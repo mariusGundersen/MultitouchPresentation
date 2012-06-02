@@ -1,0 +1,39 @@
+
+/*
+a{
+	-webkit-transition-property: color, -webkit-transform;
+	-webkit-transition-duration: 0.5s;
+	color: #000;
+	-webkit-transform: scale(1);
+	display: inline-block;
+}
+
+a:hover{
+	color: #f00;
+	-webkit-transform: scale(1.5);
+	-webkit-animation-name: bounce;
+	-webkit-animation-duration: 1s;
+	-webkit-animation-direction: alternate;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-timing-function: ease-in-out;
+}
+
+@-webkit-keyframes bounce{
+	from{
+		-webkit-transform: scale(1.2);
+	}
+	to{
+		-webkit-transform: scale(1.5);
+	}
+}
+*/
+
+#login input{
+	-webkit-transition-property: background-color, border-color;
+	-webkit-transition-duration: 1s, 1s;
+}
+
+#login input::-webkit-input-placeholder{
+	-webkit-transition-property: color;
+	-webkit-transition-duration: 1s;
+}

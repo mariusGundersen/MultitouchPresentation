@@ -1,0 +1,132 @@
+<!doctype html>
+<title>Multitouch in HTML5</title>
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		border-width: 0;
+	}
+	body{
+		background: black;
+	}
+	canvas{
+		display: block;
+	}
+</style>
+<canvas></canvas>
+<ul id="slideshow">
+	<li data-slide="1"></li>
+</ul>
+<script>
+
+var SLIDE_PREFIX = "slides/Multitouch in HTML5/Slide",
+	_canvas,
+	_ctx,
+	_currentSlide = 1,
+	_slideshow = {
+		1 :"ciber-logo.png",
+		2 :"",
+		3 :"",
+		4 :"",
+		5 :"",
+		6 :"../Diagrams/touchEvents.html",
+		7 :"../Diagrams/TouchEventArrays.html",
+		8 :"",
+		9 :"../Lessons/badTouch.html",
+		10:"../Lessons/goodTouch.html",
+		11:"../Diagrams/coordinates.html",
+		12:"",
+		13:"../Demos/dragList/index.html",
+		14:"",
+		15:"../Demos/Map/index.html",
+		16:"../Lessons/native.html",
+		17:"../Demos/touch.html",
+		18:"",
+		19:"../Demos/slingshot.html",
+		20:"",
+		21:"../Demos/CiberGame/index.html",
+		22:"",
+		23:"../Demos/Origami3D/examples/touchRaycasting.html",
+	};
+
+
+function init(){
+	_canvas = document.getElementsByTagName("canvas")[0];
+	_ctx = _canvas.getContext("2d");
+	
+	_canvas.width = window.innerWidth;
+	_canvas.height = window.innerHeight;
+	_canvas.style.width = _canvas.width + "px";
+	_canvas.style.height = _canvas.height + "px";
+	
+	_canvas.addEventListener("click", onTap, false);
+	window.addEventListener("hashchange", onHashChange, false);
+	
+	_currentSlide = getCurrentSlide(1);
+	
+	loadImage(slideURL(_currentSlide), drawScaledImage);
+}
+function onHashChange(e){
+	var slide = document.location.hash.substring(1);
+	_currentSlide = slide;
+	setCurrentSlide(_currentSlide);
+	loadImage(slideURL(_currentSlide), drawScaledImage);
+}
+function onTap(e){
+	if(e.pageX < window.innerWidth/3){
+		_currentSlide--;
+	}else if(e.pageX > window.innerWidth*2/3){
+		_currentSlide++;
+	}else{
+		var url = _currentSlide in _slideshow ? _slideshow[_currentSlide] : "";
+		if(url.length > 0){
+			document.location = url;
+		}
+	}
+	setCurrentSlide(_currentSlide);
+	loadImage(slideURL(_currentSlide), drawScaledImage);
+	document.location = "#"+_currentSlide;
+	//e.preventDefault();
+}
+
+function loadImage(url, callback){
+	var img = new Image();
+	img.src = url;
+	img.onload = function(){callback.call(this, img);};
+}
+
+function slideURL(slide){
+	return SLIDE_PREFIX + slide + ".PNG";
+}
+
+
+function getCurrentSlide(fallback){
+	return localStorage.getItem("currentSlide") || fallback;
+}
+function setCurrentSlide(slide){
+	localStorage.setItem("currentSlide", slide);
+}
+
+function drawScaledImage(img){
+	var w = img.width;
+	var h = img.height;
+	var x = 0;
+	var y = 0;
+	
+	if(w < _canvas.width){
+		h = h/w * _canvas.width;
+		w = _canvas.width;
+	}
+	if(h > _canvas.height){
+		w = w/h * _canvas.height;
+		h = _canvas.height;
+	}
+	x = (_canvas.width - w)/2;
+	y = (_canvas.height - h)/2;
+	
+	_ctx.drawImage(img, x, y, w, h);
+};
+
+init();
+</script>

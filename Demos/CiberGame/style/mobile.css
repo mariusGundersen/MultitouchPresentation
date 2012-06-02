@@ -1,0 +1,105 @@
+
+
+body{
+	background: rgb(197,204,211) url(../gfx/stripes.png);
+	-webkit-user-select: none;
+	-webkit-text-size-adjust: none;
+	padding: 0;
+}
+section{
+	margin: 0 auto;
+	padding: 10px;
+	max-width: 480px;
+	background:transparent;
+}
+section>*{
+	margin: 0;
+	padding: 10px;
+	display: block;
+	border-top: 0px solid #FFF;
+	border-left: 1px solid #B4B4B4;
+	border-right: 1px solid #B4B4B4;
+	border-bottom: 1px solid #B4B4B4;
+	background: white;
+}
+section>*:first-child{
+	border-top: 1px solid #B4B4B4;
+	border-radius: 8px 8px 0 0;
+}
+section>*:last-child{
+	border-bottom: 1px solid #B4B4B4;
+	border-radius: 0 0 8px 8px;
+	margin-bottom: 50px;
+}
+
+tr{
+	border-bottom: 1px solid #B4B4B4;
+	
+}
+
+section>* a{
+	text-indent: -9999px;
+	overflow: hidden;
+	width: 32px;
+	background: transparent url(../gfx/go.png) no-repeat center right;
+}
+section>a{
+	background: white url(../gfx/go.png) no-repeat center right;
+	text-decoration: none;
+	color: black;
+}
+
+
+h2{
+	text-align: center;
+}
+#login input{
+	display: inline-block;
+	width: 100%;
+	margin: -10px;
+	padding: 10px;
+	border: 0px solid transparent;
+	font-size: medium;
+	background: white;
+	border-radius: 0;
+	-webkit-appearance: none;
+}
+
+#login label{
+	display: none;
+}
+
+#login form{
+	position: relative;
+}
+
+#login form a{
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 100%;
+	display: block;
+}
+
+#play{
+	margin: 0;
+	padding: 0;
+}
+
+#play canvas{
+	margin: 0;
+	padding: 0;
+	border: 0px solid transparent;
+	border-radius: 0;
+	background: transparent;
+}
+#play canvas:first-child{
+	background: white;
+}
+
+#score ul li{
+	padding: 10px;
+}
+#score ul li:not(:last-child){
+	border-bottom: 1px solid #B4B4B4;
+}

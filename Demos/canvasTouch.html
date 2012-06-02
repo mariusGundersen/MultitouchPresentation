@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>touch</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon-precomposed" href="gfx/Lenna.jpg">
+<link rel="icon" href="gfx/Lenna.jpg">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<script src="script/animate.js"></script>
+<script src="script/stats.js"></script>
+<style>
+*{
+	margin:0;
+	padding:0;
+}
+a{
+	text-decoration: none;
+}
+html, body{
+	width:100%;
+	height: 100%;
+	background: white;
+}
+#touchBase{
+	position: relative;
+	background: white;
+	width:100%;
+	height: 100%;
+}
+</style>
+</head><body>
+<canvas id="touchBase">
+</canvas>
+
+
+
+
+<script>
+var canvas,
+	gfx,
+	debug = "";
+	scale = 1;
+
+window.addEventListener("load", init, false);
+
+
+function init(){
+
+	canvas = document.getElementsByTagName("canvas")[0];
+	ctx = canvas.getContext("2d");
+	
+	window.addEventListener("resize", doResize, false);
+	
+	canvas.addEventListener("touchstart", TouchController.onTouchStart, false);
+	canvas.addEventListener("touchmove", TouchController.onTouchMove, false);
+	canvas.addEventListener("touchend", TouchController.onTouchEnd, false);
+
+	
+	createTouchable("gfx/touch.png", function(){
+		createTouchable("gfx/touch.png", function(){
+			createTouchable("gfx/touch.png", function(e){
+			
+				doResize(e);
+				
+				window.animate(onEnterFrame);
+			});
+		});
+	});
+}
+
+function createTouchable(src, callback){
+	var gfx = new Image();
+	gfx.src = src;
+	gfx.onload = function(e){
+	
+		TouchController.touchables.push(new Touchable(gfx, true));
+		callback(e);
+	}
+}
+
+function doResize(e){
+	canvas.style.width = window.innerWidth + "px";
+	canvas.style.height = window.innerHeight + "px";
+	canvas.width = window.innerWidth*scale;
+	canvas.height = window.innerHeight*scale;
+}
+
+function onEnterFrame(delta){
+	canvas.width = canvas.width;
+	ctx.save();
+	ctx.scale(scale, scale);
+	
+	for(var i=TouchController.touchables.length - 1; i>=0; i--){
+		var touchable = TouchController.touchables[i];
+		ctx.save();
+		ctx.transform.apply(ctx, touchable.matrix);
+		
+		ctx.drawImage(touchable.target, 0, 0);
+		
+		ctx.restore();
+	}
+	
+	ctx.restore();
+		
+	//stats.update();
+}
+var TouchController = (function(){
+	var _globalTouches = {},
+		_touchables = [];
+
+	function isInnside(point, rect){
+		if(point.localX < 0) return false;
+		if(point.localY < 0) return false;
+		if(point.localX > rect.width) return false;
+		if(point.localY > rect.height) return false;
+		return true;
+	}
+	function getTargetTouches(touchable, targetTouches){
+		var touches = [];
+		for(var i=0; i<targetTouches.length; i++){
+			var touch = targetTouches[i];
+			if(("t"+touch.identifier) in _globalTouches == false){
+				if(isInnside(touchable.globalToLocal(touch), touchable.target)){
+					_globalTouches["t"+touch.identifier] = touchable;
+					touches.push(touch);
+				}
+			}else if(_globalTouches["t"+touch.identifier] == touchable){
+				touches.push(touch);
+			}
+		}
+		return touches;
+	}
+	
+	function getTouchesOnTouchable(touchable, targetTouches){
+		var touches = [];
+		for(var i=0; i<targetTouches.length; i++){
+			var touch = targetTouches[i];
+			if(("t"+touch.identifier) in _globalTouches && _globalTouches["t"+touch.identifier] == touchable){
+				touches.push(touch);
+			}
+		}
+		return touches;
+	}
+
+	function onTouchStart(e){
+		_touchables.forEach(function(touchable, t){
+			var touches = getTargetTouches(touchable, e.targetTouches);
+			touchable.debug = "start";
+			if(touches.length>0){
+				touchable.doTouchStart({targetTouches:touches});
+			}
+		});
+	
+		e.preventDefault();
+		return false;
+	}
+	function onTouchMove(e){
+		_touchables.forEach(function(touchable, t){
+			var touches = getTouchesOnTouchable(touchable, e.targetTouches);
+			if(touches.length>0){
+				touchable.doTouchMove({targetTouches:touches});
+			}
+		});
+		
+		e.preventDefault();
+		return false;
+	}
+	function onTouchEnd(e){
+		_touchables.forEach(function(touchable, t){
+			var touches = getTouchesOnTouchable(touchable, e.targetTouches);
+			touchable.doTouchEnd({targetTouches:touches});
+		});
+		for(var i=0; i<e.changedTouches.length; i++){
+			var touch = e.changedTouches[i];
+			if(("t"+touch.identifier) in _globalTouches){
+				delete _globalTouches["t"+touch.identifier];
+			}
+		}
+		e.preventDefault();
+		return false;
+	}
+	
+	return {onTouchStart:onTouchStart, 
+			onTouchMove:onTouchMove,
+			onTouchEnd:onTouchEnd,
+			touchables:_touchables,
+			globalTouches:_globalTouches};
+
+})();
+function Touchable(element, rotateable){
+	var that = this;
+	this.debug = "";
+	this.target = element;
+	this.rotateable = rotateable;
+	this.debug = "";
+	this.matrix = [1, 0, 0, 1, 0, 0];
+	this.touchDist = 0;
+	this.touchRot = 0;
+	this.touches = {};
+	this.setTransform(0, 0, 1, 0);
+};
+
+Touchable.prototype.doTouchStart = function(e){
+	var touches = e.targetTouches;
+	if(touches.length >= 1){
+		var touch0 = touches[0];
+		this.setTouchPos(touch0);
+		if(touches.length >= 2){
+			var touch1 = touches[1];
+			this.setTouchPos(touch1);
+			var vector = Touchable.getTouchVector(e.targetTouches);
+			var transform = this.getTransform();
+			this.touchDist = vector.length/transform.scale;
+			if(this.rotateable){
+				this.touchRot = transform.rotation + vector.rotation;
+			}
+		}
+	}
+};
+Touchable.prototype.doTouchMove = function(e){
+	var touches = e.targetTouches;
+		
+	if(touches.length >= 1){
+		var touch0 = touches[0];
+		
+		
+		if(touches.length >= 2){
+			var scale=1, rotation=0;
+			var touch1 = touches[1];
+			var vector = Touchable.getTouchVector(touches);
+			if(this.touchDist != 0){
+				scale = vector.length/this.touchDist;
+			}
+			if(this.rotateable){
+				rotation = this.touchRot - vector.rotation;
+			}
+			this.setMatrix(-(touch0.pageX+touch1.pageX)/2, -(touch0.pageY+touch1.pageY)/2, scale, rotation);			
+			var globalTouch0 = this.getTouchPos(touch0.identifier);
+			var globalTouch1 = this.getTouchPos(touch1.identifier);
+			this.matrix[4] = - (globalTouch0.pageX + globalTouch1.pageX)/2;
+			this.matrix[5] = - (globalTouch0.pageY + globalTouch1.pageY)/2;
+
+		}else{
+			this.matrix[4] = - touch0.pageX;
+			this.matrix[5] = - touch0.pageY;
+			
+			var globalTouch = this.getTouchPos(touch0.identifier);
+			this.matrix[4] = - globalTouch.pageX;
+			this.matrix[5] = - globalTouch.pageY;
+		}
+	}
+	
+};
+
+Touchable.prototype.doTouchEnd = function(e){
+	if(e.targetTouches.length >= 1){
+		this.setTouchPos(e.targetTouches[0]);
+	}
+	if(e.targetTouches.length >= 2){
+		this.setTouchPos(e.targetTouches[1]);
+	}
+	
+	if(e.targetTouches.length == 0){
+		this.touches = {};
+	}
+};
+
+
+Touchable.prototype.setTouchPos = function(touch){
+	this.touches[touch.identifier] = this.globalToLocal(touch);
+};
+Touchable.prototype.getTouchPos = function(touch){
+	if(touch in this.touches === false){
+		this.touches[touch] = {localX:0, localY:0};
+	}
+	return this.localToGlobal(this.touches[touch]);
+};
+Touchable.prototype.setTransform = function(tx, ty, scale, rotation){
+	this.setMatrix(tx, ty, scale, rotation);
+};
+Touchable.prototype.getTransform = function(){
+	var a = this.matrix[0];
+	var b = this.matrix[2];
+	
+	var rotation = Math.atan(b/a);
+	var scale = a/Math.cos(rotation);
+	
+	return {scale:scale, rotation:rotation};
+};
+
+Touchable.prototype.setMatrix = function(tx, ty, scale, rotation){
+	this.matrix[0] = Math.cos(rotation)*scale;
+	this.matrix[2] = Math.sin(rotation)*scale;
+	this.matrix[1] = -Math.sin(rotation)*scale;
+	this.matrix[3] = Math.cos(rotation)*scale;
+	this.matrix[4] = tx;
+	this.matrix[5] = ty;
+};
+
+Touchable.prototype.localToGlobal = function(local){
+	var x = this.matrix[0]*local.localX + this.matrix[2]*local.localY + 1*this.matrix[4];
+	var y = this.matrix[1]*local.localX + this.matrix[3]*local.localY + 1*this.matrix[5];
+	return {pageX:x, pageY:y};
+};
+
+Touchable.prototype.globalToLocal = function(touch){
+	var dx = touch.pageX - this.matrix[4];
+	var dy = touch.pageY - this.matrix[5];
+	var det = this.matrix[0]*this.matrix[3] - this.matrix[1]*this.matrix[2];
+	var x = (this.matrix[3]*dx - this.matrix[2]*dy)/det;
+	var y = (-this.matrix[1]*dx + this.matrix[0]*dy)/det;
+	return {localX:x, localY:y};
+};
+
+
+Touchable.getTouchVector = function(touches){
+	var touch0 = touches[0].identifier < touches[1].identifier ? touches[0] : touches[1];
+	var touch1 = touches[0].identifier < touches[1].identifier ? touches[1] : touches[0];
+	
+	var vector = {x:touch0.pageX - touch1.pageX,
+				  y:touch0.pageY - touch1.pageY};
+	vector.length = Math.sqrt(vector.x*vector.x + vector.y*vector.y);
+	vector.rotation = Math.atan2(vector.y, vector.x);
+	vector.cx = touch1.pageX + vector.x/2;
+	vector.cy = touch1.pageY + vector.y/2;
+	return vector;
+}
+
+
+</script>
+
+
+
+</body>
+
+</html>

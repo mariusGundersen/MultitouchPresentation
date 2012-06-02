@@ -1,0 +1,146 @@
+<!doctype html>
+<title>TouchEvents</title>
+		<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		border-width: 0;
+	}
+	#debug{
+		font-size: 4em;
+	}
+	
+	#start{
+		float: right;
+		width: 300px;
+		height: 300px;
+		background: grey;
+		opacity: 0.5;
+	}
+	#touches{
+		position: absolute;
+	}
+	#touches *{
+		position: absolute;
+		width: 40px;
+		height: 40px;
+		border-radius: 20px;
+		background: blue;
+		opacity: 0.5;
+		top: -20px;
+		left: -20px;
+	}
+</style>
+<div id="touches"></div>
+<div id="start"></div>
+<pre id="debug"></pre>
+
+<script src="script/animate.js"></script>
+<script>
+
+var _debug = document.getElementById("debug"),
+	_touchesDiv = document.getElementById("touches"),
+	_ctx,
+	_startDiv = document.getElementById("start"),
+	_starts = 0,
+	_moves = 0,
+	_ends = 0,
+	_cancels = 0,
+	_enters = 0,
+	_leaves = 0,
+	_touches = {};
+
+
+function init(){
+	
+	
+	_touchesDiv.style.width = window.innerWidth + "px";
+	_touchesDiv.style.height = window.innerHeight + "px";
+	
+	document.addEventListener("touchstart", doTouchStart, false);
+	document.addEventListener("touchmove", doTouchMove, false);
+	document.addEventListener("touchend", doTouchEnd, false);
+	
+	document.addEventListener("touchstart", onTouchStart, false);
+	_startDiv.addEventListener("touchmove", onTouchMove, false);
+	document.addEventListener("touchend", onTouchEnd, false);
+	document.addEventListener("touchcancel", onTouchCancel, false);
+	_startDiv.addEventListener("touchenter", onTouchEnter, false);
+	_startDiv.addEventListener("touchleave", onTouchLeave, false);
+	
+	animate(redraw);
+}
+
+function redraw(){
+	
+
+	if(_moves != 0 && _moves % 500 == 0){
+		alert("hey popup!");
+	}
+	_debug.innerHTML = "Starts:\t"+_starts+"\n"+
+		"Moves:\t"+_moves+"\n"+
+		"Ends:\t"+_ends+"\n"+
+		"Cancels:"+_cancels+"\n"+
+		"Enters:\t"+_enters+"\n"+
+		"Leaves:\t"+_leaves;
+}
+
+
+
+function doTouchStart(e){
+	for(var i=0; i<e.changedTouches.length; i++){
+		var touch = e.changedTouches[i];
+		var elm = document.createElement("div");
+		elm.style.WebkitTransform = "translate("+touch.pageX+"px, "+touch.pageY+"px)";
+		_touchesDiv.appendChild(elm);
+		_touches["t"+touch.identifier] = elm;
+	}
+	e.preventDefault();
+}
+function doTouchMove(e){
+	for(var i=0; i<e.changedTouches.length; i++){
+		var touch = e.changedTouches[i];
+		_touches["t"+touch.identifier].style.WebkitTransform = "translate("+touch.pageX+"px, "+touch.pageY+"px)";
+	}
+	e.preventDefault();
+}
+function doTouchEnd(e){
+	for(var i=0; i<e.changedTouches.length; i++){
+		var touch = e.changedTouches[i];
+		_touchesDiv.removeChild( _touches["t"+touch.identifier]);
+		delete _touches["t"+touch.identifier];
+	}
+	e.preventDefault();
+}
+
+
+
+function onTouchStart(e){
+	_starts += e.changedTouches.length;
+	e.preventDefault();
+}
+function onTouchMove(e){
+	_moves += e.changedTouches.length;
+	e.preventDefault();
+}
+function onTouchEnd(e){
+	_ends += e.changedTouches.length;
+	e.preventDefault();
+}
+function onTouchCancel(e){
+	_cancels += e.changedTouches.length;
+	e.preventDefault();
+}
+function onTouchEnter(e){
+	_enters += e.changedTouches.length;
+	e.preventDefault();
+}
+function onTouchLeave(e){
+	_leaves += e.changedTouches.length;
+	e.preventDefault();
+}
+
+
+init();
+</script>

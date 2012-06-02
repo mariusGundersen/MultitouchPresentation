@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+
+<html manifest="index.appcache">
+	<head>
+	
+	
+	
+	
+		<meta charset=utf-8>
+		<title>Ciber Game</title>
+		
+		<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+		
+		
+		<link rel="apple-touch-icon-precomposed" href="gfx/icon.png" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		
+		
+		<script src="script/jquery-1.7.min.js"></script>
+		<script src="script/require.js" data-main="script/main"></script>
+		<link rel="stylesheet" href="style/style.css">
+		
+		
+		
+		
+	</head>
+	
+	<body>
+	
+		<section id="login" class="current">
+			<h2>Ciber Game</h2>
+			<form id="loginForm">
+				<label for="loginName">Name:</label>
+				<input type="text" id="loginName" required placeholder="your name">
+				<a href="#play">Play!</a>
+			</form>
+			<a href="#highscore">Highscore</a>
+		</section>
+		
+		
+		
+		<section id="play">
+			<canvas id="canvas" width=320 height=480></canvas>
+		</section>
+		
+		
+		
+		<section id="score">
+			<h2>Highscore <span id="synch" class="ok"/></h2>
+			<ul>
+				<li>First place <span>50</span>
+				<li>Second place <span>40</span>
+				<li>Third place <span>34</span>
+				<li>Fourth place <span>30</span>
+				<li>Fifth palce <span>28</span>
+			</ul>
+			<a href="#login">Play again</a>
+		</section>
+				
+		
+	</body>
+</html>

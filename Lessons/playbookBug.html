@@ -1,0 +1,88 @@
+<!doctype html>
+<title>Playbook bug</title>
+		<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		border-width: 0;
+	}
+	
+	#touches{
+		position: absolute;
+	}
+	#touches *{
+		position: absolute;
+		width: 40px;
+		height: 40px;
+		border-radius: 20px;
+		background: blue;
+		opacity: 0.5;
+		top: -20px;
+		left: -20px;
+	}
+</style>
+<pre id="debug"></pre>
+<div id="touches"></div>
+
+<script>
+
+var _debug = document.getElementById("debug"),
+	_touchesDiv = document.getElementById("touches"),
+	_touches = {};
+
+
+function init(){
+	
+	
+	_touchesDiv.style.width = window.innerWidth + "px";
+	_touchesDiv.style.height = window.innerHeight + "px";
+	
+	
+	
+	start();
+	
+}
+
+function start(){
+	document.addEventListener("touchstart", doTouchStart, false);
+	document.addEventListener("touchmove", doTouchMove, false);
+	document.addEventListener("touchend", doTouchEnd, false);
+}
+
+function log(){
+	console.log.apply(console, arguments);
+}
+
+function doTouchStart(e){
+	for(var i=0; i<e.changedTouches.length; i++){
+		var touch = e.changedTouches[i];
+		log("new", touch.identifier);
+		var elm = document.createElement("div");
+		elm.style.WebkitTransform = "translate("+touch.pageX+"px, "+touch.pageY+"px)";
+		_touchesDiv.appendChild(elm);
+		_touches["t"+touch.identifier] = elm;
+	}
+	e.preventDefault();
+}
+function doTouchMove(e){
+	for(var i=0; i<e.changedTouches.length; i++){
+		var touch = e.changedTouches[i];
+		_touches["t"+touch.identifier].style.WebkitTransform = "translate("+touch.pageX+"px, "+touch.pageY+"px)";
+	}
+	e.preventDefault();
+}
+function doTouchEnd(e){
+	for(var i=0; i<e.changedTouches.length; i++){
+		var touch = e.changedTouches[i];
+		log("old", touch.identifier);
+		_touchesDiv.removeChild( _touches["t"+touch.identifier]);
+		delete _touches["t"+touch.identifier];
+	}
+	log("all", e.touches.length);
+	e.preventDefault();
+}
+
+
+init();
+</script>

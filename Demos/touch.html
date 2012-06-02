@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>touch</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon-precomposed" href="gfx/touch.png">
+<link rel="icon" href="gfx/touch.png">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+*{
+	margin:0;
+	padding:0;
+}
+a{
+	text-decoration: none;
+}
+html, body{
+	width:100%;
+	height: 100%;
+	background: white;
+}
+#touchBase{
+	position: relative;
+	background: white;
+	width:100%;
+	height: 100%;
+}
+.touchable{
+	-o-transform-origin: 0 0;
+	-webkit-transform-origin: 0 0;
+	-moz-transform-origin: 0 0;
+	position: absolute;
+	z-index: 1;
+	display: block;
+	background: transparent;
+}
+#button{
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	padding: 0.5em;
+	text-align: center;
+	font-size: 150%;
+	display: block;
+	color: black;
+	text-effect: none;
+}
+#button[href="#add"]{
+	
+	background: #84ba28;
+	background: -moz-linear-gradient(top,  #84ba28 0%, #8ac32f 50%, #6ba113 51%, #669c08 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#84ba28), color-stop(50%,#8ac32f), color-stop(51%,#6ba113), color-stop(100%,#669c08));
+	background: -webkit-linear-gradient(top,  #84ba28 0%,#8ac32f 50%,#6ba113 51%,#669c08 100%);
+	background: -o-linear-gradient(top,  #84ba28 0%,#8ac32f 50%,#6ba113 51%,#669c08 100%);
+	background: -ms-linear-gradient(top,  #84ba28 0%,#8ac32f 50%,#6ba113 51%,#669c08 100%);
+	background: linear-gradient(top,  #84ba28 0%,#8ac32f 50%,#6ba113 51%,#669c08 100%);
+
+}
+#button[href="#add"].active{
+	background: #9dd53a;
+	background: -moz-linear-gradient(top, #9dd53a 0%, #a1d54f 50%, #80c217 51%, #7cbc0a 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#9dd53a), color-stop(50%,#a1d54f), color-stop(51%,#80c217), color-stop(100%,#7cbc0a));
+	background: -webkit-linear-gradient(top, #9dd53a 0%,#a1d54f 50%,#80c217 51%,#7cbc0a 100%);
+	background: -o-linear-gradient(top, #9dd53a 0%,#a1d54f 50%,#80c217 51%,#7cbc0a 100%);
+	background: -ms-linear-gradient(top, #9dd53a 0%,#a1d54f 50%,#80c217 51%,#7cbc0a 100%);
+	background: linear-gradient(top, #9dd53a 0%,#a1d54f 50%,#80c217 51%,#7cbc0a 100%);
+}
+
+#button[href="#remove"]{
+	background: #b72828;
+	background: -moz-linear-gradient(top,  #b72828 0%, #c13030 50%, #a01313 51%, #9b0909 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#b72828), color-stop(50%,#c13030), color-stop(51%,#a01313), color-stop(100%,#9b0909));
+	background: -webkit-linear-gradient(top,  #b72828 0%,#c13030 50%,#a01313 51%,#9b0909 100%);
+	background: -o-linear-gradient(top,  #b72828 0%,#c13030 50%,#a01313 51%,#9b0909 100%);
+	background: -ms-linear-gradient(top,  #b72828 0%,#c13030 50%,#a01313 51%,#9b0909 100%);
+	background: linear-gradient(top,  #b72828 0%,#c13030 50%,#a01313 51%,#9b0909 100%);
+}
+
+#button[href="#remove"].active{
+	background: #dd6161;
+	background: -moz-linear-gradient(top,  #dd6161 0%, #db6f6f 50%, #e73939 51%, #f22424 100%);
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#dd6161), color-stop(50%,#db6f6f), color-stop(51%,#e73939), color-stop(100%,#f22424));
+	background: -webkit-linear-gradient(top,  #dd6161 0%,#db6f6f 50%,#e73939 51%,#f22424 100%);
+	background: -o-linear-gradient(top,  #dd6161 0%,#db6f6f 50%,#e73939 51%,#f22424 100%);
+	background: -ms-linear-gradient(top,  #dd6161 0%,#db6f6f 50%,#e73939 51%,#f22424 100%);
+	background: linear-gradient(top,  #dd6161 0%,#db6f6f 50%,#e73939 51%,#f22424 100%);
+
+}
+</style>
+</head><body>
+<div id="touchBase">
+	<img class="touchable rotateable" src="gfx/touch.png" style="-webkit-transform: matrix(0.5, 0, 0, 0.5, 0, 0); ">
+	<img class="touchable" src="gfx/touch.png" style="-webkit-transform: matrix(0.5, 0, 0, 0.5, 256, 0); ">
+</div>
+<a id="button" href="#add">Add Image</a>
+
+
+
+
+<script>
+var button;
+
+window.addEventListener("load", init, false);
+
+
+function init(){
+
+	button = document.getElementById("button");
+	button.addEventListener("touchstart", buttonTouchStart, false);
+	button.addEventListener("touchmove", buttonTouchMove, false);
+	button.addEventListener("touchend", buttonTouchEnd, false);
+
+	document.body.addEventListener("touchstart", doPreventDefault, false);
+	document.body.addEventListener("touchmove", doPreventDefault, false);
+	document.body.addEventListener("touchend", doPreventDefault, false);
+
+	var w = document.body.clientWidth;
+	
+	var elements = document.body.getElementsByClassName("touchable");
+	var scale = w/(elements[0].width*elements.length*1.5);
+	for(var i=0; i<elements.length; i++){
+		var element = elements[i];
+		var touchable = new Touchable(element);
+		touchable.setTransform(i*element.width*scale*(elements.length + 1)/2 + element.width*scale/(elements.length + 1), 50, scale, 0);
+		
+	}
+}
+
+function doPreventDefault(e){
+	if(e.type == "touchstart"){
+		for(var i=0; i<e.touches.length; i++){
+			if(e.touches[i].target != document.body && e.touches[i].target != button){
+				button.href="#remove";
+				button.innerHTML = "Remove Image";
+				break;
+			}
+		}
+	}else if(e.type == "touchend"){
+		if(e.touches.length == 0){
+			button.href="#add";
+			button.innerHTML = "Add Image";
+		}
+		if(e.changedTouches.length > 0){
+			for(var i=0; i<e.changedTouches.length; i++){
+				if(e.changedTouches[i].pageY > button.offsetTop && e.changedTouches[i].target.className.indexOf("touchable") > -1){
+					var target = e.changedTouches[i].target;
+					target.parentNode.removeChild(target);
+				}
+			}
+		}
+	}else{
+		var active = false
+		for(var i=0; i<e.touches.length; i++){
+			if(e.touches[i].target == button || e.touches[i].target.className.indexOf("touchable") > -1){
+				if(e.touches[i].pageY > button.offsetTop){
+					active = true
+					break;
+				}
+			}
+		}
+		button.className = active ? "active" : "";
+	}
+	e.preventDefault();
+	return false;
+
+};
+
+
+function buttonTouchStart(e){
+	this.className = "active";
+	e.preventDefault();
+	return false;
+
+};
+function buttonTouchMove(e){
+	if(e.targetTouches > 0){
+		var touch0 = e.targetTouches[0];
+		if(touch0.pageY > this.offsetTop){
+			this.className = "active";
+		}else{
+			this.className = "";
+		}
+	}
+
+	e.preventDefault();
+	return false;
+
+};
+function buttonTouchEnd(e){
+	if(this.className == "active"){
+		var elm = document.createElement("img");
+		elm.src = "gfx/touch.png";
+		elm.className = "touchable";
+		elm.className += Math.random() > 0.5 ? " rotateable" : "";
+		var touchable = new Touchable(elm);
+		document.getElementById("touchBase").appendChild(elm);
+		touchable.setHighestZ();
+	}
+	this.className = "";
+	e.preventDefault();
+	return false;
+
+};
+
+function Touchable(element){
+	var that = this;
+	this.target = element;
+	this.rotateable = element.className.indexOf("rotateable") >= 0;
+	this.matrix = [1, 0, 0, 1, 0, 0];
+	this.touchDist = 0;
+	this.touchRot = 0;
+	this.touches = {};
+	this.setTransform(0, 0, 1, 0);
+	element.addEventListener("touchstart", function(e){that.doTouchStart(e)}, false);
+	element.addEventListener("touchmove", function(e){that.doTouchMove(e)}, false);
+	element.addEventListener("touchend", function(e){that.doTouchEnd(e)}, false);
+};
+
+Touchable.prototype.doTouchStart = function(e){
+	var touches = e.targetTouches;
+	if(touches.length >= 1){
+		var touch0 = touches[0];
+		this.setTouchPos(touch0);
+		if(touches.length >= 2){
+			var touch1 = touches[1];
+			this.setTouchPos(touch1);
+			var vector = Touchable.getTouchVector(e.targetTouches);
+			var transform = this.getTransform();
+			this.touchDist = vector.length/transform.scale;
+			if(this.rotateable){
+				this.touchRot = transform.rotation + vector.rotation;
+			}
+		}
+	}
+	this.setHighestZ();
+};
+Touchable.prototype.doTouchMove = function(e){
+	var touches = e.targetTouches;
+		
+	if(touches.length >= 1){
+		var touch0 = touches[0];
+		
+		
+		if(touches.length >= 2){
+			var scale=1, rotation=0;
+			var touch1 = touches[1];
+			var vector = Touchable.getTouchVector(touches);
+			scale = vector.length/this.touchDist;
+			if(this.rotateable){
+				rotation = this.touchRot - vector.rotation;
+			}
+			this.setMatrix(-(touch0.pageX+touch1.pageX)/2, -(touch0.pageY+touch1.pageY)/2, scale, rotation);			
+			var globalTouch0 = this.getTouchPos(touch0.identifier);
+			var globalTouch1 = this.getTouchPos(touch1.identifier);
+			this.matrix[4] = - (globalTouch0.pageX + globalTouch1.pageX)/2;
+			this.matrix[5] = - (globalTouch0.pageY + globalTouch1.pageY)/2;
+
+		}else{
+			this.matrix[4] = - touch0.pageX;
+			this.matrix[5] = - touch0.pageY;
+			
+			var globalTouch = this.getTouchPos(touch0.identifier);
+			this.matrix[4] = - globalTouch.pageX;
+			this.matrix[5] = - globalTouch.pageY;
+		}
+		
+		this.applyTransform();
+	}
+	
+};
+
+Touchable.prototype.doTouchEnd = function(e){
+	if(e.targetTouches.length >= 1){
+		this.setTouchPos(e.targetTouches[0]);
+	}
+	if(e.targetTouches.length >= 2){
+		this.setTouchPos(e.targetTouches[1]);
+	}
+};
+
+
+Touchable.prototype.setTouchPos = function(touch){
+	this.touches[touch.identifier] = this.globalToLocal(touch);
+};
+Touchable.prototype.getTouchPos = function(touch){
+	if(touch in this.touches === false){
+		this.touches[touch] = {localX:0, localY:0};
+	}
+	return this.localToGlobal(this.touches[touch]);
+};
+
+Touchable.prototype.applyTransform = function(){
+	var matrix = "matrix("+this.matrix.join(", ")+")";
+	this.target.style.WebkitTransform = matrix;
+	this.target.style.OTransform = matrix;
+	this.target.style.MozTransform = matrix;
+};
+Touchable.prototype.setTransform = function(tx, ty, scale, rotation){
+	this.setMatrix(tx, ty, scale, rotation);
+	this.applyTransform();
+};
+Touchable.prototype.getTransform = function(){
+	var a = this.matrix[0];
+	var b = this.matrix[2];
+	
+	var rotation = Math.atan(b/a);
+	var scale = a/Math.cos(rotation);
+	
+	return {scale:scale, rotation:rotation};
+};
+
+Touchable.prototype.setMatrix = function(tx, ty, scale, rotation){
+	this.matrix[0] = Math.cos(rotation)*scale;
+	this.matrix[2] = Math.sin(rotation)*scale;
+	this.matrix[1] = -Math.sin(rotation)*scale;
+	this.matrix[3] = Math.cos(rotation)*scale;
+	this.matrix[4] = tx;
+	this.matrix[5] = ty;
+};
+
+Touchable.prototype.localToGlobal = function(local){
+	var x = this.matrix[0]*local.localX + this.matrix[2]*local.localY + 1*this.matrix[4];
+	var y = this.matrix[1]*local.localX + this.matrix[3]*local.localY + 1*this.matrix[5];
+	return {pageX:x, pageY:y};
+};
+
+Touchable.prototype.globalToLocal = function(touch){
+	var dx = touch.pageX - this.matrix[4];
+	var dy = touch.pageY - this.matrix[5];
+	var det = this.matrix[0]*this.matrix[3] - this.matrix[1]*this.matrix[2];
+	var x = (this.matrix[3]*dx - this.matrix[2]*dy)/det;
+	var y = (-this.matrix[1]*dx + this.matrix[0]*dy)/det;
+	return {localX:x, localY:y};
+};
+
+
+Touchable.getTouchVector = function(touches){
+	var touch0 = touches[0].identifier < touches[1].identifier ? touches[0] : touches[1];
+	var touch1 = touches[0].identifier < touches[1].identifier ? touches[1] : touches[0];
+	
+	var vector = {x:touch0.pageX - touch1.pageX,
+				  y:touch0.pageY - touch1.pageY};
+	vector.length = Math.sqrt(vector.x*vector.x + vector.y*vector.y);
+	vector.rotation = Math.atan2(vector.y, vector.x);
+	vector.cx = touch1.pageX + vector.x/2;
+	vector.cy = touch1.pageY + vector.y/2;
+	return vector;
+}
+
+Touchable.prototype.setHighestZ = function(){
+	
+	var touchables = document.body.getElementsByClassName("touchable");
+	var highest = 0;
+	for(var i = 0; i<touchables.length; i++){
+		var z = touchables[i].style.zIndex*1 || 0;
+		if(z > highest) highest = z;
+	}
+	this.target.style.zIndex = 1 + highest;
+}
+
+</script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+<?php header('Content-type: text/cache-manifest'); ?>
+CACHE MANIFEST
+
+#12:06 14-12-2011 
+#<?php echo time(); ?>
+
+NETWORK:
+
+index.html
+
+style/style.css
+style/common.css
+style/desktop.css
+style/mobile.css
+style/portrait.css
+style/landscape.css
+style/animate.css
+
+script/animate.js
+script/backend.js
+script/draw.js
+script/expose.js
+script/game.js
+script/gui.js
+script/input.js
+script/jquery-1.7.min.js
+script/main.js
+script/require.js
+
+
+gfx/red.png
+gfx/blue.png
+gfx/green.png
+gfx/orange.png
+
+gfx/go.png
+gfx/icon.png
+gfx/stripes.png
+gfx/warning.gif
+gfx/throbber.gif
+
+
+
+
+
+
+NETWORK:
+index.appcache
+highscore.ajax

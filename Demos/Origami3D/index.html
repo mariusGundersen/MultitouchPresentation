@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Origami 3D Engine</title>
+<style>
+ul{
+	overflow: auto;
+	display: inline-block;
+	margin: 2em;
+}
+ul li{
+	list-style: none;
+	float: left;
+	display: inline-block;
+	text-align: center;
+	margin: 5px;
+	vertical-align: bottom;
+}
+ul li a{
+	font-family: Helvetica, arial, sans-serif;
+	display: inline-block;
+	width: 240px;
+	height: 160px;
+	color: white;
+	font-weight: bold;
+	vertical-align: bottom;
+	text-decoration: none;
+	background: rgba(0,0,0,0.5);
+}
+ul li a:hover{
+	background: rgba(0,0,0,0);
+	color: white;
+}
+#earthOrbit{
+	background-image: url(examples/gfx/ss_earth_orbit.png);
+}
+#raycasting{
+	background-image: url(examples/gfx/ss_raycasting.png);
+}
+#raycastingMobile{
+	background-image: url(examples/gfx/ss_raycasting_mobile.png);
+}
+#mode7{
+	background-image: url(examples/gfx/ss_mode7.png);
+}
+#ripples{
+	background-image: url(examples/gfx/ss_ripples.png);
+}
+#skybox{
+	background-image: url(examples/gfx/ss_skybox.png);
+}
+
+</style>
+</head>
+<body>
+<h1>Origami 3D Engine</h1>
+
+
+<ul>
+	<li id="earthOrbit"><a href="examples/earthOrbit.html"><span>Earth Orbit</span></a></li>
+	<li id="raycasting"><a href="examples/raycasting.html">Raycasting</a></li>
+	<li id="raycastingMobile"><a href="examples/touchRaycasting.html">Raycasting (Android/iOS 5)</a></li>
+	<li id="mode7"><a href="examples/mode7.html">Mode7</a></li>
+	<li id="ripples"><a href="examples/ripples.html">Ripples</a></li>
+	<li id="skybox"><a href="examples/skybox.html">Skybox (iOS 5)</a></li>
+
+</ul>
+
+<p>
+The Origami3D Engine is a 3D engine written entirely in JavaScript, using only the 2D context of the Canvas element to render 3D images. 
+It uses the <a href="http://en.wikipedia.org/wiki/Pinhole_camera_model" target="_blank">pinhole camera model</a>, 
+<a href="http://en.wikipedia.org/wiki/Affine_transformation" target="_blank">affine transforms</a> and the HTML5 Canvas 
+<a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/the-canvas-element.html#dom-context-2d-strokestyle" target="_blank">drawing API</a> to render the 3D images. 
+<p>
+The engine and examples should work in all modern browsers (Chrome 7+, Firefox 3.5+, Internet Explorer 9+, etc), although it might run quite slow in some browsers on certain platforms. 
+<p>
+All of these examples and the engine are available on my public <a href="http://git.mariusgundersen.net" target="_blank">GitHub</a>. 
+
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<title>Bad Touches</title>
+		<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		border-width: 0;
+	}
+	#debug{
+		font-size: 4em;
+	}
+	
+	#start{
+		float: right;
+		width: 300px;
+		height: 300px;
+		background: grey;
+		opacity: 0.5;
+	}
+	#touches{
+		position: absolute;
+	}
+	#touches img{
+		display: block;
+		position: absolute;
+		width: 416px;
+		height: 162px;
+		top: 50%;
+		left: 50%;
+		margin-left: -208px;
+		margin-top: -81px;
+	}
+</style>
+<div id="touches"><img id="rotate" src="gfx/ciber.png"></div>
+
+<script>
+
+var _touchesDiv = document.getElementById("touches"),
+	_rotateImg = document.getElementById("rotate"),
+	_touches = {
+		diff:0,
+		offset:0
+		};
+
+
+function init(){
+	
+	
+	_touchesDiv.style.width = window.innerWidth + "px";
+	_touchesDiv.style.height = window.innerHeight + "px";
+	_touches.x = window.innerWidth/2;
+	_touches.y = window.innerHeight/2;
+	
+	document.addEventListener("touchstart", onTouchStart, false);
+	document.addEventListener("touchmove", onTouchMove, false);
+	document.addEventListener("touchend", onTouchEnd, false);
+	
+}
+function onTouchStart(e){
+	onDragStart(e.touches[0].pageX, e.touches[0].pageY);
+	e.preventDefault();
+}
+
+function onTouchMove(e){
+	onDragMove(e.touches[0].pageX, e.touches[0].pageY);
+	e.preventDefault();
+}
+
+function onTouchEnd(e){
+	onDragEnd(e.changedTouches[0].pageX, e.changedTouches[0].pageY);
+	e.preventDefault();
+}
+
+
+function onDragStart(x, y){
+	var angle = Math.atan2(y - _touches.y, x - _touches.x);
+	_touches.diff = angle;
+}
+function onDragMove(x, y){
+	var angle = Math.atan2(y - _touches.y, x - _touches.x) - _touches.diff + _touches.offset;
+	_rotateImg.style.WebkitTransform = "rotate("+angle+"rad)";
+}
+function onDragEnd(x, y){
+	var angle = Math.atan2(y - _touches.y, x - _touches.x);
+	_touches.offset = angle - _touches.diff + _touches.offset;
+}
+
+
+init();
+</script>

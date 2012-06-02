@@ -1,0 +1,86 @@
+<!doctype html>
+<title>Fast Processing</title>
+		<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		border-width: 0;
+	}
+	#debug{
+		font-size: 4em;
+	}
+	
+	#start{
+		float: right;
+		width: 300px;
+		height: 300px;
+		background: grey;
+		opacity: 0.5;
+	}
+	#touches{
+		position: absolute;
+	}
+	#touches *{
+		position: absolute;
+		width: 40px;
+		height: 40px;
+		border-radius: 20px;
+		background: blue;
+		opacity: 0.5;
+		top: -20px;
+		left: -20px;
+	}
+</style>
+<canvas id="touches"></canvas>
+
+<script src="script/animate.js"></script>
+<script>
+
+var _touchesDiv = document.getElementById("touches"),
+	_ctx,
+	_startDiv = document.getElementById("start"),
+	_touches = {},
+	_animation;
+
+
+function init(){
+	
+	
+	_touchesDiv.style.width = window.innerWidth + "px";
+	_touchesDiv.style.height = window.innerHeight + "px";
+	_touchesDiv.width = window.innerWidth;
+	_touchesDiv.height = window.innerHeight;
+	_ctx = _touchesDiv.getContext("2d");
+	
+	_animation = animate(redraw);
+	
+	
+	document.addEventListener("touchmove", doTouchMoveF, false);
+}
+
+function redraw(){
+	var t = Date.now();
+	_ctx.clearRect(0, 0, _ctx.canvas.width, _ctx.canvas.height);
+	for(var i in _touches){
+		var touch = _touches[i];
+		_ctx.beginPath();
+		_ctx.moveTo(touch.x, touch.y);
+		_ctx.arc(touch.x, touch.y, 20, 0, Math.PI*2, false);
+		_ctx.fill();
+	}
+}
+
+
+function doTouchMoveF(e){
+	_touches = {};
+	
+	for(var i=0; i<e.touches.length; i++){
+		var touch = e.touches[i];
+		_touches["t"+touch.identifier] = {x: touch.pageX, y: touch.pageY};
+	}
+	e.preventDefault();
+}
+
+init();
+</script>

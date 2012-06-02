@@ -1,0 +1,129 @@
+<!doctype html>
+<title>Arc</title>
+		<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		border-width: 0;
+	}
+	canvas{
+		display: block;
+	}
+</style>
+<script src="script/animate.js"></script>
+<script src="script/point.js"></script>
+<canvas></canvas>
+<script>
+
+var _canvas,
+	_ctx,
+	_points = [],
+	_sliders = [];
+
+
+function init(){
+	_canvas = document.getElementsByTagName("canvas")[0];
+	_ctx = _canvas.getContext("2d");
+	
+	_canvas.width = window.innerWidth;
+	_canvas.height = window.innerHeight;
+	_canvas.style.width = _canvas.width + "px";
+	_canvas.style.height = _canvas.height + "px";
+	
+	var w = _canvas.width/5;
+	var h = _canvas.height - 100;
+	for(var i=0; i<4; i++){
+		_sliders.push(new Slider(w + w*i, 50, 50, h));
+	}
+	
+	
+	_canvas.addEventListener("touchstart", onTouchStart, false);
+	_canvas.addEventListener("touchmove", onTouchMove, false);
+	_canvas.addEventListener("touchend", onTouchEnd, false);
+	
+	
+	animate(redraw);
+	
+}
+
+function redraw(){
+	_ctx.clearRect(0, 0, _canvas.width, _canvas.height);
+	_sliders.forEach(function(e, i, c){
+		e.draw(_ctx);
+	});
+}
+
+function onTouchStart(e){
+	for(var i in e.changedTouches){
+		var touch = e.changedTouches[i];
+		_sliders.forEach(function(e, i, c){
+			if(e.isNear(touch)){
+				e.setTouch(touch);
+			}
+		});
+	}
+	e.preventDefault();
+	return false;
+}
+function onTouchMove(e){
+	for(var i in e.changedTouches){
+		var touch = e.changedTouches[i];
+		_sliders.forEach(function(e, i, c){
+			if(e.isTouchedBy(touch)){
+				e.setPos(touch.pageX, touch.pageY);
+			}
+		});
+	}
+	e.preventDefault();
+	return false;
+}
+function onTouchEnd(e){
+	for(var i in e.changedTouches){
+		var touch = e.changedTouches[i];
+		_sliders.forEach(function(e, i, c){
+			if(e.isTouchedBy(touch)){
+				e.clearTouch();
+			}
+		});
+	}
+	e.preventDefault();
+	return false;
+}
+
+function Slider(x, w, y, h){
+	this.x = x;
+	this.y = y;
+	this.w = w;
+	this.h = h;
+	this.value = 50;
+	this.touch = false;
+}
+Slider.prototype.setTouch = function(touch){
+	this.touch = touch.identifier;
+}
+Slider.prototype.isNear = function(touch){
+	return Math.abs(this.x - touch.pageX) < this.w;
+}
+Slider.prototype.isTouchedBy = function(touch){
+	return this.touch === touch.identifier;
+}
+Slider.prototype.setPos = function(x, y){
+	this.value = 100 - (y - this.y)/this.h*100;
+	this.value = Math.max(0, this.value);
+	this.value = Math.min(100, this.value);
+}
+Slider.prototype.clearTouch = function(){
+	this.touch = false;
+}
+Slider.prototype.draw = function(ctx){
+	ctx.beginPath();
+	ctx.strokeStyle = "black";
+	ctx.fillStyle = "red";
+	ctx.strokeRect(this.x-this.w/2, this.y, this.w, this.h);
+	ctx.fillRect(this.x-this.w/2+1, this.y+1 + (100-this.value)/100*this.h, this.w - 2, this.value/100*this.h - 2);
+	
+}
+
+init();
+</script>

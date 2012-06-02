@@ -1,0 +1,262 @@
+<!doctype html>
+<title>Slingshot</title>
+		<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width" />
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+		border-width: 0;
+	}
+	#debug{
+		font-size: 4em;
+	}
+	#touches, #stars{
+		position: absolute;
+	}
+	#touches *{
+		position: absolute;
+		width: 40px;
+		height: 40px;
+		border-radius: 20px;
+		background: blue;
+		opacity: 0.5;
+		top: -20px;
+		left: -20px;
+	}
+	
+	#stars *{
+		-webkit-transition: opacity 0.5s;
+		opacity: 1;
+		position: absolute;
+		width: 40px;
+		height: 40px;
+		background: url(gfx/star.png);
+		opacity: 0.5;
+		top: -20px;
+		left: -20px;
+	}
+	#stars .gone{
+		opacity: 0;
+	}
+</style>
+<div id="touches">
+	<div id="first"></div>
+	<div id="second"></div>
+	<div id="third"></div>
+	<div id="ball" style="background: red"></div>
+</div>
+<div id="stars"></div>
+<pre id="debug"></pre>
+
+<script src="script/animate.js"></script>
+<script>
+
+var _touchesDiv = document.getElementById("touches"),
+	_debugDiv = document.getElementById("debug"),
+	_firstDiv = document.getElementById("first"),
+	_secondDiv = document.getElementById("second"),
+	_thirdDiv = document.getElementById("third"),
+	_ballDiv = document.getElementById("ball"),
+	_starsDiv = document.getElementById("stars"),
+	_touches,
+	_stars,
+	_gameOver,
+	_points,
+	_ball,
+	_animation,
+	_w,
+	_h,
+	_r = 20;
+
+
+function init(){
+	
+	_w = window.innerWidth - _r;
+	_h = window.innerHeight - _r;
+	_touchesDiv.style.width = window.innerWidth + "px";
+	_touchesDiv.style.height = window.innerHeight + "px";
+	
+	_animation = animate(redraw);
+	startGame();
+}
+
+function startGame(){
+	document.removeEventListener("click", startGame);
+	
+	
+	_ball = {
+		x:0,
+		y:0,
+		xs:0,
+		ys:0,
+		
+	};
+	_points = 0;
+	_gameover = false;
+	_touches = {};
+	_stars = [];
+	
+	
+	_ball.x = _w/2;
+	_ball.y = _h/2;
+
+	document.addEventListener("touchstart", doTouchStart, false);
+	document.addEventListener("touchmove", doTouchMove, false);
+	document.addEventListener("touchend", doTouchEnd, false);
+	initStars(20);
+	_animation.unpause();
+}
+
+function stopGame(){
+	document.removeEventListener("touchstart", doTouchStart);
+	document.removeEventListener("touchmove", doTouchMove);
+	document.removeEventListener("touchend", doTouchEnd);
+	_animation.pause();
+	document.addEventListener("click", startGame, false);
+}
+
+function initStars(count){
+	for(var i=0; i<count; i++){
+		var x = Math.random()*(_w-_r)+_r;
+		var y = Math.random()*(_h-_r)+_r;
+		var elm = document.createElement("div");
+		elm.style.WebkitTransform = "translate("+x+"px, "+y+"px)";
+		_starsDiv.appendChild(elm);
+		_stars.push({
+			x: x,
+			y: y,
+			elm: elm,
+			exists: true
+		});
+	}
+}
+
+function redraw(t){
+	if(_gameOver){
+		stopGame();
+		_debugDiv.innerHTML = "GameOver\n"+_debugDiv.innerHTML;
+		return;
+	}
+	position("first", _firstDiv);
+	position("second", _secondDiv);
+	position("third", _thirdDiv);
+	if("third" in _touches){
+		_ball.x = _touches.third.x;
+		_ball.y = _touches.third.y;
+		_ball.xs = 0;
+		_ball.ys = 0;
+	}
+	if(_touches.shoot){
+		_points -= 2;
+		_touches.shoot = false;
+		var tx = (_touches.first.x + _touches.second.x)/2;
+		var ty = (_touches.first.y + _touches.second.y)/2;
+		_ball.xs = -(_ball.x - tx)/10;
+		_ball.ys = -(_ball.y - ty)/10;
+	}
+	_ball.x += _ball.xs;
+	_ball.y += _ball.ys
+	_ball.xs *= .99;
+	_ball.ys *= .99;
+	if(_ball.x < _r){
+		_ball.xs *= -1;
+		_ball.x = _r + _r - _ball.x;
+	}
+	if(_ball.y < _r){
+		_ball.ys *= -1;
+		_ball.y = _r + _r - _ball.y;
+	}
+	if(_ball.x > _w){
+		_ball.xs *= -1;
+		_ball.x = _w - (_ball.x - _w);
+	}
+	if(_ball.y > _h){
+		_ball.ys *= -1;
+		_ball.y = _h - (_ball.y - _h);
+	}
+	if("third" in _touches === false){
+		for(var i=0; i<_stars.length; i++){
+			var star = _stars[i];
+			var dx = star.x - _ball.x;
+			var dy = star.y - _ball.y;
+			if(star.exists){
+				if(dx*dx + dy*dy < 30*30){
+					star.exists = false;
+					star.elm.className = "gone";
+					star.elm.addEventListener("transitioned", function(){
+						start.elm.parentNode.removeChild(star.elm);
+					}, false);
+					_points++;
+					_stars.splice(i, 1);
+					i--;
+				}
+			}
+		}
+	}
+	if(_stars.length == 0){
+		_gameOver = true;
+	}
+	_ballDiv.style.WebkitTransform = "translate("+_ball.x+"px, "+_ball.y+"px)";
+	_debugDiv.innerHTML = _points;
+}
+
+function position(name, div){
+	if(name in _touches){
+		div.style.display = "block";
+		div.style.WebkitTransform = "translate("+_touches[name].x+"px, "+_touches[name].y+"px)";
+	}else{
+		div.style.display = "none";
+	}
+}
+
+function doTouchStart(e){
+	
+	if(e.touches.length >= 1){
+		_touches.first = {x:e.touches[0].pageX, y:e.touches[0].pageY};
+		if(e.touches.length >= 2){
+			_touches.second = {x:e.touches[1].pageX, y:e.touches[1].pageY};
+			if(e.touches.length >= 3){
+				_touches.third = {x:e.touches[2].pageX, y:e.touches[2].pageY};
+			}
+		}
+	}
+	e.preventDefault();
+}
+
+
+function doTouchMove(e){
+	if(e.touches.length >= 1){
+		_touches.first.x = e.touches[0].pageX;
+		_touches.first.y = e.touches[0].pageY;
+		if(e.touches.length >= 2){
+			_touches.second.x = e.touches[1].pageX;
+			_touches.second.y = e.touches[1].pageY;
+			if(e.touches.length >= 3){
+				_touches.third.x = e.touches[2].pageX;
+				_touches.third.y = e.touches[2].pageY;
+			}
+		}
+	}
+	e.preventDefault();
+}
+
+
+function doTouchEnd(e){
+	_touches.shoot = false;
+	if(e.touches.length < 3){
+		delete _touches.third;
+		_touches.shoot = true
+		if(e.touches.length < 2){
+			_touches.shoot = false;
+			delete _touches.second;
+			if(e.touches.length < 1){
+				delete _touches.first;
+			}
+		}
+	}
+	e.preventDefault();
+}
+
+
+init();
+</script>

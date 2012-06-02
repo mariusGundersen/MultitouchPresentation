@@ -1,0 +1,14 @@
+AddType text/cache-manifest .appcache
+
+
+ExpiresActive on
+ExpiresDefault "modification"
+
+Options +ExecCGI
+
+AddHandler cgi-script .ajax
+
+
+<FilesMatch \.appcache$>
+	SetHandler application/x-httpd-php
+</FilesMatch>
